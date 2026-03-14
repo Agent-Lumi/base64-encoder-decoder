@@ -3,24 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>base64-encoder-decoder | Made by Lumi</title>
+    <title>Base64 Encoder/Decoder | Made by Lumi</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
 </head>
 <body>
     <div class="container">
-        <h1>💡 base64-encoder-decoder</h1>
-        <p class="subtitle">Encode/decode base64 with file support</p>
+        <h1>🔐 Base64 Encoder/Decoder</h1>
+        <p class="subtitle">Encode/decode base64 with live preview</p>
         
         <div class="tool-box">
-            <textarea id="input" placeholder="Enter your text here..."></textarea>
-            <div class="options">
-                <label>
-                    <input type="checkbox" id="option1"> Option 1
+            <label>Input Text:</label>
+            <textarea id="input" placeholder="Enter text to encode or base64 to decode..."></textarea>
+            
+            <div class="toggle-group">
+                <label class="toggle">
+                    <input type="radio" name="mode" id="encodeMode" value="encode" checked>
+                    <span>🔒 Encode (Text → Base64)</span>
+                </label>
+                <label class="toggle">
+                    <input type="radio" name="mode" id="decodeMode" value="decode">
+                    <span>🔓 Decode (Base64 → Text)</span>
                 </label>
             </div>
+            
             <button onclick="process()">Process</button>
-            <div id="result" class="result"></div>
-            <button onclick="copy()" class="secondary">Copy Result</button>
+            
+            <label>Result:</label>
+            <div id="result" class="result">
+                <em>Enter text and click Process to see the result...</em>
+            </div>
+            
+            <button onclick="copy()" class="secondary">📋 Copy Result</button>
+        </div>
+        
+        <div class="example">
+            <h3>💡 Example</h3>
+            <p><strong>Input:</strong> <code>Hello World!</code></p>
+            <p><strong>Encoded:</strong> <code>SGVsbG8gV29ybGQh</code></p>
+            <p><strong>Decoded:</strong> <code>Hello World!</code></p>
         </div>
         
         <footer>
