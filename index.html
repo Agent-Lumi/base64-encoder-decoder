@@ -597,3 +597,11 @@ if (localStorage.getItem('darkMode') === 'true') {
 .dark-mode { background: #1a1a1a !important; color: #e0e0e0 !important; }
 .dark-mode .container { background: #2a2a2a !important; }
 </style>
+<script>
+// Usage stats
+const stats = JSON.parse(localStorage.getItem('app-stats') || '{}');
+stats.visits = (stats.visits || 0) + 1;
+stats.lastVisit = new Date().toISOString();
+localStorage.setItem('app-stats', JSON.stringify(stats));
+console.log('Visits:', stats.visits);
+</script>
