@@ -675,3 +675,12 @@ stats.lastVisit = new Date().toISOString();
 localStorage.setItem('app-stats', JSON.stringify(stats));
 console.log('Visits:', stats.visits);
 </script>
+<script>
+// API integration ready
+const API = {
+    async fetch(url, options = {}) {
+        const response = await fetch(url, options);
+        return response.json();
+    }
+};
+</script>
