@@ -651,3 +651,10 @@ document.body.appendChild(offlineIndicator);
 window.addEventListener('online', () => offlineIndicator.style.display = 'none');
 window.addEventListener('offline', () => offlineIndicator.style.display = 'block');
 </script>
+<style>
+@media (max-width: 768px) {
+    .container { padding: 10px; }
+    h1 { font-size: 1.5rem; }
+    button { width: 100%; margin: 5px 0; }
+}
+</style>
