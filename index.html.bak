@@ -633,3 +633,12 @@ if (!localStorage.getItem('tutorial-shown')) {
     localStorage.setItem('tutorial-shown', 'true');
 }
 </script>
+<script>
+// API integration ready
+const API = {
+    async fetch(url, options = {}) {
+        const response = await fetch(url, options);
+        return response.json();
+    }
+};
+</script>
