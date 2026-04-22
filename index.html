@@ -852,3 +852,16 @@ if (localStorage.getItem('darkMode') === 'true') {
 .dark-mode { background: #1a1a1a !important; color: #e0e0e0 !important; }
 .dark-mode .container { background: #2a2a2a !important; }
 </style>
+<script>
+// Export functionality
+function exportData(format) {
+    const data = document.querySelector('textarea, input')?.value || document.body.innerText;
+    const blob = new Blob([data], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'export.' + format;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+</script>
