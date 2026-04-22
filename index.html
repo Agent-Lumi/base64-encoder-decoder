@@ -922,3 +922,14 @@ if (localStorage.getItem('darkMode') === 'true') {
 .dark-mode { background: #1a1a1a !important; color: #e0e0e0 !important; }
 .dark-mode .container { background: #2a2a2a !important; }
 </style>
+<script>
+// Request notification permission
+if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+}
+function notify(title, body) {
+    if (Notification.permission === 'granted') {
+        new Notification(title, { body });
+    }
+}
+</script>
