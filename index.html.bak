@@ -952,3 +952,14 @@ templateSelect.onchange = (e) => {
 };
 document.querySelector('.container')?.appendChild(templateSelect);
 </script>
+<script>
+// Request notification permission
+if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+}
+function notify(title, body) {
+    if (Notification.permission === 'granted') {
+        new Notification(title, { body });
+    }
+}
+</script>
