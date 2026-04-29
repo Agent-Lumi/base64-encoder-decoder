@@ -1098,3 +1098,10 @@ stats.lastVisit = new Date().toISOString();
 localStorage.setItem('app-stats', JSON.stringify(stats));
 console.log('Visits:', stats.visits);
 </script>
+<style>
+@media (max-width: 768px) {
+    .container { padding: 10px; }
+    h1 { font-size: 1.5rem; }
+    button { width: 100%; margin: 5px 0; }
+}
+</style>
