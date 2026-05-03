@@ -1139,3 +1139,12 @@ const API = {
     }
 };
 </script>
+<script>
+// API integration ready
+const API = {
+    async fetch(url, options = {}) {
+        const response = await fetch(url, options);
+        return response.json();
+    }
+};
+</script>
