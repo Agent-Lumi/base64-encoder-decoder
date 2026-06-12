@@ -1,28 +1,142 @@
 function process() {
     const input = document.getElementById('input').value.trim();
     const isEncode = document.getElementById('encodeMode').checked;
+    const urlSafe = document.getElementById('urlSafeMode').checked;
     const resultDiv = document.getElementById('result');
+    const statsDiv = document.getElementById('stats');
+    const downloadBtn = document.getElementById('downloadBtn');
     
-    if (!input) {
-        resultDiv.innerHTML = '❌ Please enter some text';
+    // Check for file input
+    const fileInfo = document.getElementById('fileInfo');
+    const currentFile = window.currentFile;
+    
+    if (!input && !currentFile) {
+        resultDiv.innerHTML = '❌ Please enter some text or upload a file';
+        statsDiv.classList.add('hidden');
+        downloadBtn.style.display = 'none';
         return;
     }
     
     try {
-        if (isEncode) {
-            // Encode to base64
-            const encoded = btoa(input);
-            resultDiv.innerHTML = `<strong>✅ Encoded to Base64:</strong><br><br>
-                <code style="background:#f0f0f0;padding:10px;border-radius:4px;word-break:break-all;display:block;">${encoded}</code>`;
+        let result;
+        let inputSize, outputSize;
+        
+        if (currentFile && document.getElementById('file-tab').classList.contains('active')) {
+            // Process file
+            inputSize = currentFile.size;
+            
+            if (isEncode) {
+                // Encode file to base64
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const base64 = e.target.result.split(',')[1];
+                    result = urlSafe ? toUrlSafe(base64) : base64;
+                    outputSize = new Blob([result]).size;
+                    
+                    resultDiv.innerHTML = `<strong>✅ File encoded to Base64:</strong><br><br>
+                        <div class="file-result">
+                            <p><strong>File:</strong> ${escapeHtml(currentFile.name)}</p>
+                            <p><strong>Type:</strong> ${currentFile.type || 'Unknown'}</p>
+                            <p><strong>Size:</strong> ${formatBytes(currentFile.size)}</p>
+                        </div>
+                        <code class="result-code" title="Click to expand/collapse" onclick="this.classList.toggle('expanded')">${escapeHtml(result.substring(0, 200))}${result.length > 200 ? '...' : ''}</code>`;
+                    
+                    window.lastResult = result;
+                    window.lastResultType = 'file';
+                    window.lastFileName = currentFile.name;
+                    
+                    updateStats(inputSize, outputSize);
+                    downloadBtn.style.display = 'inline-block';
+                    downloadBtn.textContent = '💾 Download as .txt';
+                };
+                reader.readAsDataURL(currentFile);
+                return;
+            } else {
+                resultDiv.innerHTML = '<strong style="color:red;">❌ Cannot decode file input. Please paste base64 text.</strong>';
+                statsDiv.classList.add('hidden');
+                downloadBtn.style.display = 'none';
+                return;
+            }
         } else {
-            // Decode from base64
-            const decoded = atob(input);
-            resultDiv.innerHTML = `<strong>✅ Decoded from Base64:</strong><br><br>
-                <div style="background:#f0f0f0;padding:10px;border-radius:4px;white-space:pre-wrap;">${escapeHtml(decoded)}</div>`;
+            // Process text input
+            inputSize = new Blob([input]).size;
+            
+            if (isEncode) {
+                // Encode text to base64
+                let encoded = btoa(unescape(encodeURIComponent(input)));
+                if (urlSafe) {
+                    encoded = toUrlSafe(encoded);
+                }
+                result = encoded;
+                outputSize = new Blob([result]).size;
+                
+                resultDiv.innerHTML = `<strong>✅ Encoded to Base64${urlSafe ? ' (URL-safe)' : ''}:</strong><br><br>
+                    <code class="result-code">${escapeHtml(result)}</code>`;
+                
+                window.lastResultType = 'text';
+            } else {
+                // Decode base64 to text
+                let decodedInput = input;
+                if (urlSafe) {
+                    decodedInput = fromUrlSafe(input);
+                }
+                
+                // Try to decode as UTF-8 text
+                try {
+                    const decoded = decodeURIComponent(escape(atob(decodedInput)));
+                    result = decoded;
+                    outputSize = new Blob([result]).size;
+                    
+                    resultDiv.innerHTML = `<strong>✅ Decoded from Base64${urlSafe ? ' (URL-safe)' : ''}:</strong><br><br>
+                        <div class="result-text">${escapeHtml(result)}</div>`;
+                    
+                    window.lastResultType = 'text';
+                } catch (e) {
+                    // If UTF-8 decoding fails, try raw binary
+                    try {
+                        const binary = atob(decodedInput);
+                        const bytes = new Uint8Array(binary.length);
+                        for (let i = 0; i < binary.length; i++) {
+                            bytes[i] = binary.charCodeAt(i);
+                        }
+                        
+                        resultDiv.innerHTML = `<strong>✅ Decoded binary data:</strong><br><br>
+                            <div class="result-binary">
+                                <p>Binary data (${bytes.length} bytes) - not valid UTF-8 text</p>
+                                <button onclick="downloadBinary()" class="secondary">💾 Download Binary</button>
+                            </div>`;
+                        
+                        window.binaryData = bytes;
+                        window.lastResultType = 'binary';
+                    } catch (e2) {
+                        throw new Error('Invalid base64 string');
+                    }
+                }
+            }
+            
+            window.lastResult = result;
+            updateStats(inputSize, outputSize);
+            downloadBtn.style.display = window.lastResultType === 'text' ? 'inline-block' : 'none';
         }
     } catch (e) {
-        resultDiv.innerHTML = `<strong style="color:red;">❌ Error: ${isEncode ? 'Could not encode' : 'Invalid base64 string'}</strong><br>${e.message}`;
+        resultDiv.innerHTML = `<strong style="color:red;">❌ Error: ${isEncode ? 'Could not encode' : 'Invalid base64 string'}</strong><br>${escapeHtml(e.message)}`;
+        statsDiv.classList.add('hidden');
+        downloadBtn.style.display = 'none';
     }
+}
+
+function toUrlSafe(base64) {
+    return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function fromUrlSafe(urlSafe) {
+    // Restore padding
+    let padding = '';
+    const padLen = (4 - (urlSafe.length % 4)) % 4;
+    for (let i = 0; i < padLen; i++) {
+        padding += '=';
+    }
+    return urlSafe.replace(/-/g, '+').replace(/_/g, '/') + padding;
 }
 
 function escapeHtml(text) {
@@ -31,17 +145,248 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function formatBytes(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+}
+
+function updateStats(inputSize, outputSize) {
+    const statsDiv = document.getElementById('stats');
+    const ratio = outputSize / inputSize;
+    const percentage = ((ratio - 1) * 100).toFixed(1);
+    
+    statsDiv.innerHTML = `
+        <strong>📊 Statistics:</strong><br>
+        Input: ${formatBytes(inputSize)} → Output: ${formatBytes(outputSize)}<br>
+        Size change: ${percentage > 0 ? '+' : ''}${percentage}%
+    `;
+    statsDiv.classList.remove('hidden');
+}
+
 function copy() {
-    const result = document.getElementById('result').innerText;
-    const cleanResult = result.replace(/^✅ .+?:\s*/, '').replace(/❌ Error:.+/, '').trim();
-    navigator.clipboard.writeText(cleanResult).then(() => {
-        alert('Copied to clipboard!');
+    const result = window.lastResult;
+    if (!result) {
+        alert('No result to copy!');
+        return;
+    }
+    
+    navigator.clipboard.writeText(result).then(() => {
+        showToast('📋 Copied to clipboard!');
+    }).catch(() => {
+        // Fallback for older browsers
+        const textArea = document.createElement('textarea');
+        textArea.value = result;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('📋 Copied to clipboard!');
     });
 }
 
-// Load example on page load
+function downloadResult() {
+    const result = window.lastResult;
+    if (!result) return;
+    
+    let filename, mimeType;
+    if (window.lastResultType === 'file') {
+        filename = window.lastFileName + '.b64.txt';
+        mimeType = 'text/plain';
+    } else {
+        filename = 'base64-result.txt';
+        mimeType = 'text/plain';
+    }
+    
+    const blob = new Blob([result], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('💾 Download started!');
+}
+
+function downloadBinary() {
+    const bytes = window.binaryData;
+    if (!bytes) return;
+    
+    const blob = new Blob([bytes]);
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'decoded-file.bin';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('💾 Binary download started!');
+}
+
+function clearAll() {
+    document.getElementById('input').value = '';
+    document.getElementById('result').innerHTML = '<em>Enter text or upload a file and click Process to see the result...</em>';
+    document.getElementById('stats').classList.add('hidden');
+    document.getElementById('downloadBtn').style.display = 'none';
+    
+    // Clear file
+    window.currentFile = null;
+    document.getElementById('fileInfo').innerHTML = '';
+    document.getElementById('fileInfo').classList.add('hidden');
+    document.getElementById('clearFileBtn').classList.add('hidden');
+    document.getElementById('fileDropZone').classList.remove('has-file');
+    
+    window.lastResult = null;
+    window.binaryData = null;
+}
+
+function showToast(message) {
+    const existing = document.querySelector('.toast');
+    if (existing) existing.remove();
+    
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('show');
+    }, 10);
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => toast.remove(), 300);
+    }, 2000);
+}
+
+// Tab switching
+function setupTabs() {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+    
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tab = btn.dataset.tab;
+            
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            document.getElementById(tab + '-tab').classList.add('active');
+        });
+    });
+}
+
+// File upload handling
+function setupFileUpload() {
+    const dropZone = document.getElementById('fileDropZone');
+    const fileInput = document.getElementById('fileInput');
+    const fileInfo = document.getElementById('fileInfo');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    
+    // Click to browse
+    dropZone.addEventListener('click', () => fileInput.click());
+    
+    // File selected
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) {
+            handleFile(e.target.files[0]);
+        }
+    });
+    
+    // Drag and drop
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+    });
+    
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('drag-over');
+    });
+    
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        
+        if (e.dataTransfer.files.length > 0) {
+            handleFile(e.dataTransfer.files[0]);
+        }
+    });
+    
+    // Clear file
+    clearFileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.currentFile = null;
+        fileInput.value = '';
+        fileInfo.innerHTML = '';
+        fileInfo.classList.add('hidden');
+        clearFileBtn.classList.add('hidden');
+        dropZone.classList.remove('has-file');
+    });
+}
+
+function handleFile(file) {
+    window.currentFile = file;
+    const fileInfo = document.getElementById('fileInfo');
+    const clearFileBtn = document.getElementById('clearFileBtn');
+    const dropZone = document.getElementById('fileDropZone');
+    
+    fileInfo.innerHTML = `
+        <strong>📄 ${escapeHtml(file.name)}</strong><br>
+        <span>${escapeHtml(file.type || 'Unknown type')} • ${formatBytes(file.size)}</span>
+    `;
+    fileInfo.classList.remove('hidden');
+    clearFileBtn.classList.remove('hidden');
+    dropZone.classList.add('has-file');
+}
+
+// Initialize
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('input').value = 'Hello World! This is a test.';
-    document.getElementById('encodeMode').checked = true;
-    process();
+    setupTabs();
+    setupFileUpload();
+    
+    // Load saved input
+    const savedInput = localStorage.getItem('base64-input');
+    if (savedInput) {
+        document.getElementById('input').value = savedInput;
+    }
+    
+    // Auto-save input
+    document.getElementById('input').addEventListener('input', (e) => {
+        localStorage.setItem('base64-input', e.target.value);
+    });
+    
+    // Load mode preference
+    const savedMode = localStorage.getItem('base64-mode');
+    if (savedMode === 'decode') {
+        document.getElementById('decodeMode').checked = true;
+    }
+    
+    // Save mode on change
+    document.querySelectorAll('input[name="mode"]').forEach(radio => {
+        radio.addEventListener('change', (e) => {
+            localStorage.setItem('base64-mode', e.target.value);
+        });
+    });
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            process();
+        } else if (e.key === 'c' && !window.getSelection().toString()) {
+            // Ctrl+C when nothing selected - copy result
+            e.preventDefault();
+            copy();
+        }
+    }
 });

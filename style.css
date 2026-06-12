@@ -1,11 +1,13 @@
 :root {
     --primary: #6366f1;
     --primary-light: #818cf8;
+    --danger: #ef4444;
     --bg: #0f0f1a;
     --bg-card: #1a1a2e;
     --text: #e4e4e7;
     --text-muted: #a1a1aa;
     --border: #2e2e4a;
+    --success: #10b981;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -18,7 +20,7 @@ body {
     line-height: 1.6;
 }
 
-.container { max-width: 600px; margin: 0 auto; padding: 2rem; }
+.container { max-width: 650px; margin: 0 auto; padding: 2rem; }
 
 h1 {
     text-align: center;
@@ -35,6 +37,95 @@ h1 {
     border: 1px solid var(--border);
 }
 
+/* Tabs */
+.input-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: auto;
+}
+
+.tab-btn:hover {
+    border-color: var(--primary);
+    color: var(--text);
+}
+
+.tab-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* File Drop Zone */
+.file-drop-zone {
+    border: 2px dashed var(--border);
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 1rem;
+}
+
+.file-drop-zone:hover {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.05);
+}
+
+.file-drop-zone.drag-over {
+    border-color: var(--primary);
+    background: rgba(99, 102, 241, 0.1);
+}
+
+.file-drop-zone.has-file {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.file-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.file-drop-zone p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.file-info {
+    background: var(--bg);
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.file-info span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* Form elements */
 input, select, textarea {
     width: 100%;
     padding: 0.75rem 1rem;
@@ -44,6 +135,7 @@ input, select, textarea {
     background: var(--bg);
     color: var(--text);
     font-size: 1rem;
+    font-family: inherit;
 }
 
 input:focus, select:focus, textarea:focus {
@@ -51,40 +143,19 @@ input:focus, select:focus, textarea:focus {
     border-color: var(--primary);
 }
 
-.input-group { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
-
-.arrow { color: var(--primary-light); font-size: 1.5rem; }
-
-button {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--primary);
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
+textarea {
+    min-height: 120px;
+    resize: vertical;
 }
 
-button:hover { background: var(--primary-light); transform: translateY(-2px); }
-
-button.secondary {
-    background: transparent;
-    border: 1px solid var(--primary);
-    margin-top: 0.5rem;
+label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
 }
 
-.result {
-    margin: 1rem 0;
-    padding: 1rem;
-    background: var(--bg);
-    border-radius: 8px;
-    min-height: 50px;
-}
-
-.options { margin-bottom: 1rem; }
-
+/* Toggle group */
 .toggle-group {
     display: flex;
     gap: 1rem;
@@ -97,13 +168,16 @@ button.secondary {
     align-items: center;
     gap: 0.5rem;
     cursor: pointer;
-    padding: 0.5rem;
+    padding: 0.75rem;
     border-radius: 8px;
-    transition: background 0.2s;
+    border: 1px solid var(--border);
+    transition: all 0.2s;
+    flex: 1;
+    min-width: 200px;
 }
 
 .toggle:hover {
-    background: rgba(255,255,255,0.05);
+    border-color: var(--primary);
 }
 
 .toggle input[type="radio"] {
@@ -111,6 +185,157 @@ button.secondary {
     margin: 0;
 }
 
+.toggle:has(input:checked) {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--primary);
+}
+
+/* Checkbox */
+.options {
+    margin-bottom: 1rem;
+}
+
+.checkbox {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.checkbox:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+.checkbox input[type="checkbox"] {
+    width: auto;
+    margin: 0;
+}
+
+/* Buttons */
+button {
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--primary);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+}
+
+button:hover {
+    background: var(--primary-light);
+    transform: translateY(-2px);
+}
+
+button.secondary {
+    background: transparent;
+    border: 1px solid var(--primary);
+    margin-top: 0.5rem;
+}
+
+button.secondary:hover {
+    background: rgba(99, 102, 241, 0.1);
+}
+
+button.danger {
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+button.danger:hover {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Result */
+.result {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: var(--bg);
+    border-radius: 8px;
+    min-height: 50px;
+    word-break: break-word;
+}
+
+.result-code {
+    display: block;
+    background: rgba(0,0,0,0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.9rem;
+    cursor: pointer;
+    user-select: all;
+    max-height: 200px;
+    overflow: auto;
+    transition: max-height 0.3s;
+}
+
+.result-code.expanded {
+    max-height: 1000px;
+}
+
+.result-text {
+    background: rgba(0,0,0,0.3);
+    padding: 1rem;
+    border-radius: 8px;
+    white-space: pre-wrap;
+    font-family: inherit;
+}
+
+.result-binary {
+    text-align: center;
+    padding: 1rem;
+}
+
+.file-result {
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.file-result p {
+    margin-bottom: 0.25rem;
+}
+
+/* Result actions */
+.result-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.result-actions button {
+    flex: 1;
+    min-width: 120px;
+    margin-top: 0;
+}
+
+/* Stats */
+.stats {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.stats strong {
+    color: var(--primary-light);
+}
+
+/* Hidden utility */
+.hidden {
+    display: none !important;
+}
+
+/* Example */
 .example {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -124,7 +349,7 @@ button.secondary {
 }
 
 .example p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.75rem;
     font-size: 0.9rem;
 }
 
@@ -132,15 +357,66 @@ button.secondary {
     background: rgba(0,0,0,0.3);
     padding: 0.2rem 0.5rem;
     border-radius: 4px;
-    font-family: monospace;
+    font-family: 'Monaco', 'Menlo', monospace;
+    font-size: 0.85rem;
 }
 
-footer { text-align: center; margin-top: 2rem; color: var(--text-muted); }
-footer a { color: var(--primary-light); text-decoration: none; }
+/* Footer */
+footer {
+    text-align: center;
+    margin-top: 2rem;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
 
+footer a {
+    color: var(--primary-light);
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Toast notification */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-card);
+    color: var(--text);
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 1000;
+    opacity: 0;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+/* Responsive */
 @media (max-width: 600px) {
     .container { padding: 1rem; }
     h1 { font-size: 1.5rem; }
-    .input-group { flex-direction: column; }
-    .arrow { transform: rotate(90deg); }
+    .tool-box { padding: 1.5rem; }
+    .toggle-group { flex-direction: column; }
+    .toggle { min-width: 100%; }
+    .result-actions { flex-direction: column; }
+    .result-actions button { width: 100%; }
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    animation: fadeIn 0.3s ease-out;
 }
