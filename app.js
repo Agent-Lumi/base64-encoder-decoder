@@ -1,3 +1,45 @@
+// Load example data
+function loadExample(type = 'hello') {
+    const input = document.getElementById('input');
+    const encodeMode = document.getElementById('encodeMode');
+    const decodeMode = document.getElementById('decodeMode');
+    const urlSafeMode = document.getElementById('urlSafeMode');
+    const resultDiv = document.getElementById('result');
+    
+    // Switch to text tab
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    document.querySelector('[data-tab="text"]').classList.add('active');
+    document.getElementById('text-tab').classList.add('active');
+    
+    switch(type) {
+        case 'hello':
+            input.value = 'Hello World!';
+            encodeMode.checked = true;
+            urlSafeMode.checked = false;
+            break;
+        case 'urlsafe':
+            input.value = 'Hello+World/';
+            encodeMode.checked = true;
+            urlSafeMode.checked = true;
+            break;
+        case 'decode':
+            input.value = 'SGVsbG8gV29ybGQ=';
+            decodeMode.checked = true;
+            urlSafeMode.checked = false;
+            break;
+    }
+    
+    // Auto-save the loaded example
+    localStorage.setItem('base64-input', input.value);
+    
+    // Clear previous result and show preview
+    resultDiv.innerHTML = '<em>Example loaded! Click Process to see the result...</em>';
+    
+    // Auto-focus the process button
+    showToast(`🎲 Loaded "${type}" example - click Process or press Ctrl+Enter`);
+}
+
 function process() {
     const input = document.getElementById('input').value.trim();
     const isEncode = document.getElementById('encodeMode').checked;

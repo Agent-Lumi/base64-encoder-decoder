@@ -47,10 +47,15 @@
             </div>
             
             <div class="options">
-                <label class="checkbox">
+                <label class="checkbox" title="Use URL-safe Base64 encoding (replaces +/ with -_)">
                     <input type="checkbox" id="urlSafeMode">
                     <span>🔗 URL-safe Base64 (replaces +/ with -_)</span>
                 </label>
+            </div>
+            
+            <div class="example-actions">
+                <button type="button" onclick="loadExample()" class="secondary">🎲 Load Example</button>
+                <span class="example-hint">Click to see it work!</span>
             </div>
             
             <button onclick="process()">Process</button>
@@ -71,9 +76,21 @@
         
         <div class="example">
             <h3>💡 Examples</h3>
-            <p><strong>Text Input:</strong> <code>Hello World!</code> → <code>SGVsbG8gV29ybGQh</code></p>
-            <p><strong>URL-safe:</strong> <code>Hello+World/</code> → <code>SGVsbG8rV29ybGQv</code> (standard) vs <code>SGVsbG8rV29ybGQv</code> → <code>SGVsbG8rV29ybGQv</code> (URL-safe: <code>SGVsbG8rV29ybGQv</code>)</p>
-            <p><strong>File:</strong> Upload any file to get its base64 representation</p>
+            <div class="example-grid">
+                <div class="example-card" onclick="loadExample('hello')">
+                    <strong>Hello World</strong>
+                    <code>Hello World!</code> → <code>SGVsbG8gV29ybGQh</code>
+                </div>
+                <div class="example-card" onclick="loadExample('urlsafe')">
+                    <strong>URL-safe Mode</strong>
+                    <code>Hello+World/</code> → URL-safe base64
+                </div>
+                <div class="example-card" onclick="loadExample('decode')">
+                    <strong>Decode Example</strong>
+                    <code>SGVsbG8gV29ybGQ=</code> → text
+                </div>
+            </div>
+            <p class="file-example"><strong>📁 File:</strong> Upload any file to get its base64 representation</p>
         </div>
         
         <footer>
@@ -84,30 +101,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-<script>
-// Usage stats
-const stats = JSON.parse(localStorage.getItem('app-stats') || '{}');
-stats.visits = (stats.visits || 0) + 1;
-stats.lastVisit = new Date().toISOString();
-localStorage.setItem('app-stats', JSON.stringify(stats));
-console.log('Visits:', stats.visits);
-</script>
-<script>
-// Templates gallery
-const templates = [
-    { name: 'Default', apply: () => {} },
-    { name: 'Minimal', apply: () => document.body.style.fontFamily = 'system-ui, sans-serif' }
-];
-const templateSelect = document.createElement('select');
-templates.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.name;
-    opt.textContent = t.name;
-    templateSelect.appendChild(opt);
-});
-templateSelect.onchange = (e) => {
-    const template = templates.find(t => t.name === e.target.value);
-    if (template) template.apply();
-};
-document.querySelector('.container')?.appendChild(templateSelect);
-</script>
