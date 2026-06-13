@@ -425,7 +425,44 @@ function handleFile(file) {
     dropZone.classList.add('has-file');
 }
 
-// Initialize
+// Theme management
+const ThemeManager = {
+    currentTheme: localStorage.getItem('base64-theme') || 'dark',
+    
+    init() {
+        this.applyTheme(this.currentTheme);
+        this.setupToggle();
+    },
+    
+    applyTheme(theme) {
+        document.documentElement.setAttribute('data-theme', theme);
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) {
+            toggleBtn.textContent = theme === 'dark' ? '☀️' : '🌙';
+            toggleBtn.title = theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+        }
+        this.currentTheme = theme;
+        localStorage.setItem('base64-theme', theme);
+    },
+    
+    toggle() {
+        const newTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.applyTheme(newTheme);
+        showToast(`${newTheme === 'dark' ? '🌙' : '☀️'} Switched to ${newTheme} mode`);
+    },
+    
+    setupToggle() {
+        const toggleBtn = document.getElementById('themeToggle');
+        if (toggleBtn) {
+            toggleBtn.addEventListener('click', () => this.toggle());
+        }
+    }
+};
+
+// Initialize theme on DOM ready
+document.addEventListener('DOMContentLoaded', () => {
+    ThemeManager.init();
+});
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     setupFileUpload();
@@ -491,6 +528,10 @@ document.addEventListener('keydown', (e) => {
             e.preventDefault();
             document.getElementById('decodeMode').checked = true;
             document.getElementById('decodeMode').dispatchEvent(new Event('change'));
+        } else if (e.key === 't') {
+            // Ctrl+T - toggle theme
+            e.preventDefault();
+            ThemeManager.toggle();
         }
     }
 });

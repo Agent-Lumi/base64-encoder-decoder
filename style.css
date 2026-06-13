@@ -8,16 +8,121 @@
     --text-muted: #a1a1aa;
     --border: #2e2e4a;
     --success: #10b981;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+/* Light mode variables */
+[data-theme="light"] {
+    --primary: #4f46e5;
+    --primary-light: #6366f1;
+    --danger: #dc2626;
+    --bg: #f8fafc;
+    --bg-card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --success: #059669;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth theme transitions */
+body, .tool-box, .result, .example, .history-section, .shortcuts-help,
+input, select, textarea, button, .tab-btn, .file-drop-zone, .example-card,
+.toast, .history-item, .file-info {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
 
 body {
     font-family: system-ui, -apple-system, sans-serif;
-    background: linear-gradient(135deg, var(--bg) 0%, #1a1a2e 100%);
+    background: linear-gradient(135deg, var(--bg) 0%, var(--bg-card) 100%);
     color: var(--text);
     min-height: 100vh;
     line-height: 1.6;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--bg-card);
+    border: 2px solid var(--border);
+    color: var(--text);
+    font-size: 1.5rem;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+    border-color: var(--primary);
+    box-shadow: 0 6px 20px var(--shadow-color);
+}
+
+.theme-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Light mode specific overrides */
+[data-theme="light"] body {
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+}
+
+[data-theme="light"] .result-code,
+[data-theme="light"] .result-text {
+    background: #f1f5f9;
+    border: 1px solid var(--border);
+}
+
+[data-theme="light"] .example {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+[data-theme="light"] .history-section {
+    background: rgba(99, 102, 241, 0.03);
+}
+
+[data-theme="light"] .history-item {
+    background: #f8fafc;
+}
+
+[data-theme="light"] .history-item:hover {
+    background: #f1f5f9;
+}
+
+[data-theme="light"] .shortcuts-help {
+    background: rgba(99, 102, 241, 0.05);
+}
+
+[data-theme="light"] .shortcuts-list kbd {
+    background: #f1f5f9;
+    border-color: #cbd5e1;
+}
+
+[data-theme="light"] .example-card {
+    background: var(--bg);
+}
+
+[data-theme="light"] .example-card:hover {
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+}
+
+[data-theme="light"] .example-card code {
+    background: #f1f5f9;
+}
+
+[data-theme="light"] .toast {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 }
 
 .container { max-width: 650px; margin: 0 auto; padding: 2rem; }

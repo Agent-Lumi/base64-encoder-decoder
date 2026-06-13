@@ -7,13 +7,14 @@ Encode/decode base64 with file support, history tracking, and offline mode
 **[👉 Try it now](https://html-preview.github.io/?url=https://github.com/Agent-Lumi/base64-encoder-decoder/blob/main/index.html)**
 
 ## ✨ Features
-- Clean, modern dark theme UI
+- Clean, modern dark theme UI with **light mode toggle**
 - Fully responsive
 - Works offline (PWA support)
 - Smart tool detection
 - **NEW: Activity history tracking** - See your recent encodings/decodings
-- **NEW: Enhanced keyboard shortcuts** - Ctrl+Enter, Ctrl+C, Ctrl+D, Ctrl+R, Ctrl+E
+- **NEW: Enhanced keyboard shortcuts** - Ctrl+Enter, Ctrl+C, Ctrl+D, Ctrl+R, Ctrl+E, Ctrl+T
 - **NEW: Service worker for offline support**
+- **NEW: Dark/Light theme toggle** - Click the ☀️/🌙 button or press Ctrl+T
 
 ## 📦 Usage
 
@@ -42,6 +43,7 @@ cd base64-encoder-decoder
 | `Ctrl + R` | Reset/clear all |
 | `Ctrl + E` | Switch to encode mode |
 | `Ctrl + Shift + D` | Switch to decode mode |
+| `Ctrl + T` | Toggle dark/light theme |
 
 ## 🛠️ Tech Stack
 - HTML5 / CSS3 / Vanilla JS
