@@ -1,6 +1,6 @@
 # base64-encoder-decoder
 
-Encode/decode base64 with file support
+Encode/decode base64 with file support, history tracking, and offline mode
 
 ## 🚀 Live Demo
 
@@ -9,8 +9,11 @@ Encode/decode base64 with file support
 ## ✨ Features
 - Clean, modern dark theme UI
 - Fully responsive
-- Works offline
+- Works offline (PWA support)
 - Smart tool detection
+- **NEW: Activity history tracking** - See your recent encodings/decodings
+- **NEW: Enhanced keyboard shortcuts** - Ctrl+Enter, Ctrl+C, Ctrl+D, Ctrl+R, Ctrl+E
+- **NEW: Service worker for offline support**
 
 ## 📦 Usage
 
@@ -24,10 +27,27 @@ cd base64-encoder-decoder
 # Open index.html
 ```
 
+### Option 3: Install as PWA
+1. Open the live demo in Chrome/Edge
+2. Click the install icon in the address bar
+3. Access offline anytime!
+
+## ⌨️ Keyboard Shortcuts
+
+| Shortcut | Action |
+|----------|--------|
+| `Ctrl + Enter` | Process (encode/decode) |
+| `Ctrl + C` | Copy result |
+| `Ctrl + D` | Download result |
+| `Ctrl + R` | Reset/clear all |
+| `Ctrl + E` | Switch to encode mode |
+| `Ctrl + Shift + D` | Switch to decode mode |
+
 ## 🛠️ Tech Stack
 - HTML5 / CSS3 / Vanilla JS
 - No dependencies
 - 100% client-side
+- Service Worker for offline support
 
 ## 📝 License
 MIT

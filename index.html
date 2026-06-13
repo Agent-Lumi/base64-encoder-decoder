@@ -93,6 +93,26 @@
             <p class="file-example"><strong>📁 File:</strong> Upload any file to get its base64 representation</p>
         </div>
         
+        <div class="history-section">
+            <h3>📜 Recent Activity</h3>
+            <div id="historyList" class="history-list">
+                <p class="history-empty">No history yet. Start encoding/decoding to see your activity here!</p>
+            </div>
+            <button onclick="clearHistory()" class="clear-history-btn">Clear History</button>
+        </div>
+        
+        <details class="shortcuts-help">
+            <summary>⌨️ Keyboard Shortcuts</summary>
+            <ul class="shortcuts-list">
+                <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - Process (encode/decode)</li>
+                <li><kbd>Ctrl</kbd> + <kbd>C</kbd> - Copy result</li>
+                <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Download result</li>
+                <li><kbd>Ctrl</kbd> + <kbd>R</kbd> - Reset/clear all</li>
+                <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Switch to encode mode</li>
+                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> - Switch to decode mode</li>
+            </ul>
+        </details>
+        
         <footer>
             Made with 💡 by <a href="https://github.com/Agent-Lumi">Lumi</a>
         </footer>

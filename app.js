@@ -1,45 +1,3 @@
-// Load example data
-function loadExample(type = 'hello') {
-    const input = document.getElementById('input');
-    const encodeMode = document.getElementById('encodeMode');
-    const decodeMode = document.getElementById('decodeMode');
-    const urlSafeMode = document.getElementById('urlSafeMode');
-    const resultDiv = document.getElementById('result');
-    
-    // Switch to text tab
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.querySelector('[data-tab="text"]').classList.add('active');
-    document.getElementById('text-tab').classList.add('active');
-    
-    switch(type) {
-        case 'hello':
-            input.value = 'Hello World!';
-            encodeMode.checked = true;
-            urlSafeMode.checked = false;
-            break;
-        case 'urlsafe':
-            input.value = 'Hello+World/';
-            encodeMode.checked = true;
-            urlSafeMode.checked = true;
-            break;
-        case 'decode':
-            input.value = 'SGVsbG8gV29ybGQ=';
-            decodeMode.checked = true;
-            urlSafeMode.checked = false;
-            break;
-    }
-    
-    // Auto-save the loaded example
-    localStorage.setItem('base64-input', input.value);
-    
-    // Clear previous result and show preview
-    resultDiv.innerHTML = '<em>Example loaded! Click Process to see the result...</em>';
-    
-    // Auto-focus the process button
-    showToast(`🎲 Loaded "${type}" example - click Process or press Ctrl+Enter`);
-}
-
 function process() {
     const input = document.getElementById('input').value.trim();
     const isEncode = document.getElementById('encodeMode').checked;
@@ -90,6 +48,9 @@ function process() {
                     updateStats(inputSize, outputSize);
                     downloadBtn.style.display = 'inline-block';
                     downloadBtn.textContent = '💾 Download as .txt';
+                    
+                    // Save to history
+                    saveToHistory(currentFile.name, 'file', inputSize, outputSize);
                 };
                 reader.readAsDataURL(currentFile);
                 return;
@@ -159,6 +120,9 @@ function process() {
             window.lastResult = result;
             updateStats(inputSize, outputSize);
             downloadBtn.style.display = window.lastResultType === 'text' ? 'inline-block' : 'none';
+            
+            // Save to history
+            saveToHistory(input.substring(0, 50) + (input.length > 50 ? '...' : ''), window.lastResultType, inputSize, outputSize);
         }
     } catch (e) {
         resultDiv.innerHTML = `<strong style="color:red;">❌ Error: ${isEncode ? 'Could not encode' : 'Invalid base64 string'}</strong><br>${escapeHtml(e.message)}`;
@@ -308,6 +272,78 @@ function showToast(message) {
     }, 2000);
 }
 
+// History feature
+function saveToHistory(description, type, inputSize, outputSize) {
+    const history = getHistory();
+    const entry = {
+        id: Date.now(),
+        description,
+        type,
+        inputSize,
+        outputSize,
+        timestamp: new Date().toISOString()
+    };
+    
+    history.unshift(entry);
+    // Keep only last 50 entries
+    if (history.length > 50) {
+        history.pop();
+    }
+    
+    localStorage.setItem('base64-history', JSON.stringify(history));
+    renderHistory();
+}
+
+function getHistory() {
+    try {
+        return JSON.parse(localStorage.getItem('base64-history')) || [];
+    } catch (e) {
+        return [];
+    }
+}
+
+function clearHistory() {
+    localStorage.removeItem('base64-history');
+    renderHistory();
+}
+
+function renderHistory() {
+    const history = getHistory();
+    const container = document.getElementById('historyList');
+    
+    if (!container) return;
+    
+    if (history.length === 0) {
+        container.innerHTML = '<p class="history-empty">No history yet. Start encoding/decoding to see your activity here!</p>';
+        return;
+    }
+    
+    container.innerHTML = history.slice(0, 10).map(entry => {
+        const date = new Date(entry.timestamp);
+        const timeAgo = getTimeAgo(date);
+        return `
+            <div class="history-item" data-id="${entry.id}">
+                <div class="history-info">
+                    <span class="history-type">${entry.type === 'file' ? '📁' : '📝'} ${escapeHtml(entry.description)}</span>
+                    <span class="history-time">${timeAgo}</span>
+                </div>
+                <div class="history-sizes">
+                    ${formatBytes(entry.inputSize)} → ${formatBytes(entry.outputSize)}
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function getTimeAgo(date) {
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    if (seconds < 60) return 'just now';
+    if (seconds < 3600) return Math.floor(seconds / 60) + ' min ago';
+    if (seconds < 86400) return Math.floor(seconds / 3600) + ' hours ago';
+    return Math.floor(seconds / 86400) + ' days ago';
+}
+
 // Tab switching
 function setupTabs() {
     const tabBtns = document.querySelectorAll('.tab-btn');
@@ -393,6 +429,7 @@ function handleFile(file) {
 document.addEventListener('DOMContentLoaded', () => {
     setupTabs();
     setupFileUpload();
+    renderHistory();
     
     // Load saved input
     const savedInput = localStorage.getItem('base64-input');
@@ -417,6 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('base64-mode', e.target.value);
         });
     });
+    
+    // Register service worker for offline support
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(console.error);
+    }
 });
 
 // Keyboard shortcuts
@@ -429,6 +471,34 @@ document.addEventListener('keydown', (e) => {
             // Ctrl+C when nothing selected - copy result
             e.preventDefault();
             copy();
+        } else if (e.key === 'd') {
+            // Ctrl+D - download result
+            e.preventDefault();
+            if (window.lastResult) {
+                downloadResult();
+            }
+        } else if (e.key === 'r') {
+            // Ctrl+R - reset/clear
+            e.preventDefault();
+            clearAll();
+        } else if (e.key === 'e') {
+            // Ctrl+E - encode mode
+            e.preventDefault();
+            document.getElementById('encodeMode').checked = true;
+            document.getElementById('encodeMode').dispatchEvent(new Event('change'));
+        } else if (e.key === 'D') {
+            // Ctrl+Shift+D - decode mode
+            e.preventDefault();
+            document.getElementById('decodeMode').checked = true;
+            document.getElementById('decodeMode').dispatchEvent(new Event('change'));
         }
     }
 });
+
+// Export functions for inline onclick handlers
+window.process = process;
+window.copy = copy;
+window.clearAll = clearAll;
+window.downloadResult = downloadResult;
+window.downloadBinary = downloadBinary;
+window.clearHistory = clearHistory;
