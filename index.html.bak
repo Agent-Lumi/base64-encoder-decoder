@@ -9,6 +9,7 @@
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
+    <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">🌙</button>
     <div class="container">
         <h1>🔐 Base64 Encoder/Decoder</h1>
         <p class="subtitle">Encode/decode base64 with live preview & file support</p>
@@ -47,10 +48,15 @@
             </div>
             
             <div class="options">
-                <label class="checkbox">
+                <label class="checkbox" title="Use URL-safe Base64 encoding (replaces +/ with -_)">
                     <input type="checkbox" id="urlSafeMode">
                     <span>🔗 URL-safe Base64 (replaces +/ with -_)</span>
                 </label>
+            </div>
+            
+            <div class="example-actions">
+                <button type="button" onclick="loadExample()" class="secondary">🎲 Load Example</button>
+                <span class="example-hint">Click to see it work!</span>
             </div>
             
             <button onclick="process()">Process</button>
@@ -71,10 +77,43 @@
         
         <div class="example">
             <h3>💡 Examples</h3>
-            <p><strong>Text Input:</strong> <code>Hello World!</code> → <code>SGVsbG8gV29ybGQh</code></p>
-            <p><strong>URL-safe:</strong> <code>Hello+World/</code> → <code>SGVsbG8rV29ybGQv</code> (standard) vs <code>SGVsbG8rV29ybGQv</code> → <code>SGVsbG8rV29ybGQv</code> (URL-safe: <code>SGVsbG8rV29ybGQv</code>)</p>
-            <p><strong>File:</strong> Upload any file to get its base64 representation</p>
+            <div class="example-grid">
+                <div class="example-card" onclick="loadExample('hello')">
+                    <strong>Hello World</strong>
+                    <code>Hello World!</code> → <code>SGVsbG8gV29ybGQh</code>
+                </div>
+                <div class="example-card" onclick="loadExample('urlsafe')">
+                    <strong>URL-safe Mode</strong>
+                    <code>Hello+World/</code> → URL-safe base64
+                </div>
+                <div class="example-card" onclick="loadExample('decode')">
+                    <strong>Decode Example</strong>
+                    <code>SGVsbG8gV29ybGQ=</code> → text
+                </div>
+            </div>
+            <p class="file-example"><strong>📁 File:</strong> Upload any file to get its base64 representation</p>
         </div>
+        
+        <div class="history-section">
+            <h3>📜 Recent Activity</h3>
+            <div id="historyList" class="history-list">
+                <p class="history-empty">No history yet. Start encoding/decoding to see your activity here!</p>
+            </div>
+            <button onclick="clearHistory()" class="clear-history-btn">Clear History</button>
+        </div>
+        
+        <details class="shortcuts-help">
+            <summary>⌨️ Keyboard Shortcuts</summary>
+            <ul class="shortcuts-list">
+                <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - Process (encode/decode)</li>
+                <li><kbd>Ctrl</kbd> + <kbd>C</kbd> - Copy result</li>
+                <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Download result</li>
+                <li><kbd>Ctrl</kbd> + <kbd>R</kbd> - Reset/clear all</li>
+                <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Switch to encode mode</li>
+                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> - Switch to decode mode</li>
+                <li><kbd>Ctrl</kbd> + <kbd>T</kbd> - Toggle dark/light theme</li>
+            </ul>
+        </details>
         
         <footer>
             Made with 💡 by <a href="https://github.com/Agent-Lumi">Lumi</a>
@@ -84,11 +123,3 @@
     <script src="app.js"></script>
 </body>
 </html>
-<script>
-// Usage stats
-const stats = JSON.parse(localStorage.getItem('app-stats') || '{}');
-stats.visits = (stats.visits || 0) + 1;
-stats.lastVisit = new Date().toISOString();
-localStorage.setItem('app-stats', JSON.stringify(stats));
-console.log('Visits:', stats.visits);
-</script>
