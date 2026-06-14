@@ -536,6 +536,201 @@ document.addEventListener('keydown', (e) => {
     }
 });
 
+function processBulk() {
+    const input = document.getElementById('bulkInput').value.trim();
+    const resultDiv = document.getElementById('bulkResult');
+    const outputDiv = document.getElementById('bulkOutput');
+    const statsSpan = document.getElementById('bulkStats');
+    
+    if (!input) {
+        alert('Please enter some text to process!');
+        return;
+    }
+    
+    const lines = input.split('\n').filter(line => line.trim());
+    const autoDetect = document.getElementById('bulkAutoDetect').checked;
+    const isEncode = document.getElementById('encodeMode').checked;
+    const urlSafe = document.getElementById('urlSafeMode').checked;
+    
+    const results = [];
+    let successCount = 0;
+    let errorCount = 0;
+    
+    lines.forEach((line, index) => {
+        const trimmedLine = line.trim();
+        let result, status, action;
+        
+        try {
+            if (autoDetect) {
+                // Try to detect if it's base64
+                if (isValidBase64(trimmedLine)) {
+                    // Decode
+                    let decodedInput = urlSafe ? fromUrlSafe(trimmedLine) : trimmedLine;
+                    try {
+                        result = decodeURIComponent(escape(atob(decodedInput)));
+                        action = 'decoded';
+                    } catch (e) {
+                        // Binary data
+                        const binary = atob(decodedInput);
+                        result = '[Binary data: ' + binary.length + ' bytes]';
+                        action = 'decoded (binary)';
+                    }
+                } else {
+                    // Encode
+                    let encoded = btoa(unescape(encodeURIComponent(trimmedLine)));
+                    if (urlSafe) {
+                        encoded = toUrlSafe(encoded);
+                    }
+                    result = encoded;
+                    action = 'encoded';
+                }
+                status = 'success';
+                successCount++;
+            } else {
+                // Manual mode based on radio selection
+                if (isEncode) {
+                    let encoded = btoa(unescape(encodeURIComponent(trimmedLine)));
+                    if (urlSafe) {
+                        encoded = toUrlSafe(encoded);
+                    }
+                    result = encoded;
+                    action = 'encoded';
+                } else {
+                    let decodedInput = urlSafe ? fromUrlSafe(trimmedLine) : trimmedLine;
+                    try {
+                        result = decodeURIComponent(escape(atob(decodedInput)));
+                        action = 'decoded';
+                    } catch (e) {
+                        result = '[Invalid base64]';
+                        throw new Error('Invalid base64');
+                    }
+                }
+                status = 'success';
+                successCount++;
+            }
+        } catch (e) {
+            result = e.message || 'Error';
+            status = 'error';
+            action = 'failed';
+            errorCount++;
+        }
+        
+        results.push({
+            index: index + 1,
+            input: trimmedLine,
+            output: result,
+            status: status,
+            action: action
+        });
+    });
+    
+    // Render results
+    outputDiv.innerHTML = results.map(r => `
+        <div class="bulk-item ${r.status}">
+            <div class="bulk-item-header">
+                <span class="bulk-item-number">#${r.index}</span>
+                <span class="bulk-item-action">${r.action}</span>
+            </div>
+            <div class="bulk-item-input">
+                <strong>Input:</strong> ${escapeHtml(r.input.substring(0, 100))}${r.input.length > 100 ? '...' : ''}
+            </div>
+            <div class="bulk-item-output">
+                <strong>Output:</strong> 
+                <code class="bulk-result-code">${escapeHtml(r.output)}</code>
+                <button onclick="copyText('${escapeHtml(r.output).replace(/'/g, "\\'")}')" class="bulk-copy-btn" title="Copy this result">📋</button>
+            </div>
+        </div>
+    `).join('');
+    
+    statsSpan.innerHTML = `✅ ${successCount} successful | ❌ ${errorCount} failed`;
+    resultDiv.classList.remove('hidden');
+    
+    // Store for copy/download
+    window.bulkResults = results;
+    
+    showToast(`⚡ Processed ${lines.length} items!`);
+}
+
+function isValidBase64(str) {
+    // Check if string looks like base64
+    const base64Regex = /^[A-Za-z0-9+/\-_]+={0,2}$/;
+    if (!base64Regex.test(str)) return false;
+    
+    // Try to decode
+    try {
+        // Check length is multiple of 4 (with padding) or reasonable
+        const cleanStr = str.replace(/-/g, '+').replace(/_/g, '/');
+        if (cleanStr.length % 4 !== 0 && !str.includes('-') && !str.includes('_')) {
+            // Not standard base64 length
+            if (str.length < 20) return false; // Short strings are ambiguous
+        }
+        
+        // Actually try to decode
+        atob(cleanStr);
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
+function copyText(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 Copied to clipboard!');
+    }).catch(() => {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        showToast('📋 Copied to clipboard!');
+    });
+}
+
+function copyBulkResults() {
+    if (!window.bulkResults || window.bulkResults.length === 0) return;
+    
+    const text = window.bulkResults.map(r => r.output).join('\n');
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('📋 All results copied!');
+    });
+}
+
+function downloadBulkResults() {
+    if (!window.bulkResults || window.bulkResults.length === 0) return;
+    
+    // Create CSV
+    const csv = [
+        ['#', 'Input', 'Output', 'Action', 'Status'].join(','),
+        ...window.bulkResults.map(r => [
+            r.index,
+            '"' + r.input.replace(/"/g, '""') + '"',
+            '"' + r.output.replace(/"/g, '""') + '"',
+            r.action,
+            r.status
+        ].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'base64-bulk-results-' + new Date().toISOString().slice(0, 10) + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    showToast('💾 CSV download started!');
+}
+
+function clearBulk() {
+    document.getElementById('bulkInput').value = '';
+    document.getElementById('bulkResult').classList.add('hidden');
+    document.getElementById('bulkOutput').innerHTML = '';
+    window.bulkResults = [];
+}
+
 // Export functions for inline onclick handlers
 window.process = process;
 window.copy = copy;
@@ -543,3 +738,8 @@ window.clearAll = clearAll;
 window.downloadResult = downloadResult;
 window.downloadBinary = downloadBinary;
 window.clearHistory = clearHistory;
+window.processBulk = processBulk;
+window.copyBulkResults = copyBulkResults;
+window.downloadBulkResults = downloadBulkResults;
+window.clearBulk = clearBulk;
+window.copyText = copyText;

@@ -94,6 +94,35 @@
             <p class="file-example"><strong>📁 File:</strong> Upload any file to get its base64 representation</p>
         </div>
         
+        <div class="bulk-section">
+            <h3>📤 Bulk Processor</h3>
+            <p class="bulk-description">Process multiple items at once! Enter one item per line (text or base64).</p>
+            <textarea id="bulkInput" placeholder="Enter multiple items, one per line...
+Example:
+Hello World
+https://example.com
+SGVsbG8gV29ybGQ="></textarea>
+            <div class="bulk-options">
+                <label class="checkbox">
+                    <input type="checkbox" id="bulkAutoDetect">
+                    <span>🔍 Auto-detect encode/decode (base64 strings will be decoded)</span>
+                </label>
+            </div>
+            <button onclick="processBulk()">⚡ Process All</button>
+            <div id="bulkResult" class="bulk-result hidden">
+                <div class="bulk-header">
+                    <strong>📋 Results:</strong>
+                    <span id="bulkStats"></span>
+                </div>
+                <div id="bulkOutput" class="bulk-output"></div>
+                <div class="bulk-actions">
+                    <button onclick="copyBulkResults()" class="secondary">📋 Copy All Results</button>
+                    <button onclick="downloadBulkResults()" class="secondary">💾 Download CSV</button>
+                    <button onclick="clearBulk()" class="secondary danger">🗑️ Clear</button>
+                </div>
+            </div>
+        </div>
+
         <div class="history-section">
             <h3>📜 Recent Activity</h3>
             <div id="historyList" class="history-list">

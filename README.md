@@ -1,6 +1,6 @@
 # base64-encoder-decoder
 
-Encode/decode base64 with file support, history tracking, and offline mode
+Encode/decode base64 with file support, history tracking, bulk processing, and offline mode
 
 ## 🚀 Live Demo
 
@@ -11,10 +11,21 @@ Encode/decode base64 with file support, history tracking, and offline mode
 - Fully responsive
 - Works offline (PWA support)
 - Smart tool detection
-- **NEW: Activity history tracking** - See your recent encodings/decodings
-- **NEW: Enhanced keyboard shortcuts** - Ctrl+Enter, Ctrl+C, Ctrl+D, Ctrl+R, Ctrl+E, Ctrl+T
-- **NEW: Service worker for offline support**
-- **NEW: Dark/Light theme toggle** - Click the ☀️/🌙 button or press Ctrl+T
+- **📤 Bulk Processor** - Process multiple items at once with auto-detect
+- **📜 Activity history tracking** - See your recent encodings/decodings
+- **⌨️ Enhanced keyboard shortcuts** - Ctrl+Enter, Ctrl+C, Ctrl+D, Ctrl+R, Ctrl+E, Ctrl+T
+- **🌙 Dark/Light theme toggle** - Click the ☀️/🌙 button or press Ctrl+T
+- **📁 File upload support** - Encode files to base64
+- **🔗 URL-safe Base64** - RFC 4648 compliant
+
+## 🆕 What's New
+
+### v1.2.0 - Bulk Processor
+- Process multiple items at once (one per line)
+- Auto-detect mode: automatically encodes or decodes based on input
+- Copy individual results with one click
+- Download all results as CSV
+- Visual success/error indicators for each item
 
 ## 📦 Usage
 
