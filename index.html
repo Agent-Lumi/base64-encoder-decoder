@@ -9,12 +9,12 @@
     <link rel="manifest" href="manifest.json">
 </head>
 <body>
-    <button class="theme-toggle" id="themeToggle" title="Toggle dark/light mode">🌙</button>
+    <button class="theme-toggle animate-fade-in-down" id="themeToggle" title="Toggle dark/light mode">🌙</button>
     <div class="container">
-        <h1>🔐 Base64 Encoder/Decoder</h1>
-        <p class="subtitle">Encode/decode base64 with live preview & file support</p>
+        <h1 class="animate-fade-in-up stagger-1">🔐 Base64 Encoder/Decoder</h1>
+        <p class="subtitle animate-fade-in-up stagger-2">Encode/decode base64 with live preview & file support</p>
         
-        <div class="tool-box">
+        <div class="tool-box animate-fade-in-up stagger-3">
             <div class="input-tabs">
                 <button type="button" class="tab-btn active" data-tab="text">📝 Text Input</button>
                 <button type="button" class="tab-btn" data-tab="file">📁 File Input</button>
@@ -88,7 +88,7 @@
             <div id="stats" class="stats hidden"></div>
         </div>
         
-        <div class="example">
+        <div class="example animate-fade-in-up stagger-4">
             <h3>💡 Examples</h3>
             <div class="example-grid">
                 <div class="example-card" onclick="loadExample('hello')">
@@ -107,7 +107,7 @@
             <p class="file-example"><strong>📁 File:</strong> Upload any file to get its base64 representation</p>
         </div>
         
-        <div class="bulk-section">
+        <div class="bulk-section animate-fade-in-up stagger-5">
             <h3>📤 Bulk Processor</h3>
             <p class="bulk-description">Process multiple items at once! Enter one item per line (text or base64).</p>
             <textarea id="bulkInput" placeholder="Enter multiple items, one per line...
@@ -136,7 +136,7 @@ SGVsbG8gV29ybGQ="></textarea>
             </div>
         </div>
 
-        <div class="history-section">
+        <div class="history-section animate-fade-in-up stagger-6">
             <h3>📜 Recent Activity</h3>
             <div id="historyList" class="history-list">
                 <p class="history-empty">No history yet. Start encoding/decoding to see your activity here!</p>
@@ -163,6 +163,30 @@ SGVsbG8gV29ybGQ="></textarea>
     </div>
     
     <script src="app.js"></script>
+    <script>
+    // Enhanced animations on scroll
+    (function() {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all major sections
+        document.querySelectorAll('.bulk-section, .history-section, .shortcuts-help').forEach(section => {
+            observer.observe(section);
+        });
+    })();
+    </script>
 </body>
 </html>
 <script>

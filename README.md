@@ -8,6 +8,7 @@ Encode/decode base64 with file support, history tracking, bulk processing, and o
 
 ## ✨ Features
 - Clean, modern dark theme UI with **light mode toggle**
+- **🎬 Smooth animations** - Page load animations, scroll triggers, and hover effects
 - Fully responsive
 - Works offline (PWA support)
 - Smart tool detection
@@ -19,6 +20,13 @@ Encode/decode base64 with file support, history tracking, bulk processing, and o
 - **🔗 URL-safe Base64** - RFC 4648 compliant
 
 ## 🆕 What's New
+
+### v1.3.0 - Smooth Animations
+- ✨ Beautiful page load animations with stagger effects
+- 📜 Scroll-triggered fade-in animations for sections
+- 🎯 Smooth hover transitions on all interactive elements
+- ♿ Respects user's motion preferences (`prefers-reduced-motion`)
+- 🌊 Shimmer effects on loading states
 
 ### v1.2.0 - Bulk Processor
 - Process multiple items at once (one per line)
