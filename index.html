@@ -69,7 +69,20 @@
             <div class="result-actions">
                 <button onclick="copy()" class="secondary">📋 Copy Result</button>
                 <button onclick="downloadResult()" class="secondary" id="downloadBtn" style="display:none;">💾 Download</button>
+                <button onclick="shareResult()" class="secondary" id="shareBtn" style="display:none;">🔗 Share</button>
                 <button onclick="clearAll()" class="secondary danger">🗑️ Clear</button>
+            </div>
+            
+            <!-- Export Format Options -->
+            <div class="export-formats" id="exportFormats" style="display:none;">
+                <label class="export-label">📤 Export Format:</label>
+                <div class="export-buttons">
+                    <button onclick="exportAs('txt')" class="export-btn" title="Plain text file">📄 TXT</button>
+                    <button onclick="exportAs('json')" class="export-btn" title="JSON format">📄 JSON</button>
+                    <button onclick="exportAs('base64')" class="export-btn" title="Base64 file">📄 B64</button>
+                    <button onclick="exportAs('html')" class="export-btn" title="HTML with formatting">📄 HTML</button>
+                    <button onclick="exportAs('markdown')" class="export-btn" title="Markdown format">📄 MD</button>
+                </div>
             </div>
             
             <div id="stats" class="stats hidden"></div>
