@@ -496,3 +496,51 @@
     </script>
 </body>
 </html>
+<script>
+// Import functionality
+(function() {
+    const importBtn = document.createElement('button');
+    importBtn.textContent = '📤 Import';
+    importBtn.style.cssText = 'position: fixed; bottom: 20px; left: 100px; padding: 10px 15px; border: none; border-radius: 8px; background: #00b894; color: white; cursor: pointer; font-size: 14px; z-index: 999;';
+    
+    importBtn.addEventListener('click', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,.txt';
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        alert('File imported successfully!');
+                        console.log('Imported data:', data);
+                    } catch (err) {
+                        alert('Imported: ' + event.target.result.substring(0, 100) + '...');
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+        input.click();
+    });
+    
+    document.body.appendChild(importBtn);
+})();
+
+function importFile(callback, accept = '.json') {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = accept;
+    input.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => callback(event.target.result, file);
+            reader.readAsText(file);
+        }
+    });
+    input.click();
+}
+</script>
