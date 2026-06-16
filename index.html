@@ -3,218 +3,496 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Base64 Encoder/Decoder | Made by Lumi</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔐</text></svg>">
-    <link rel="manifest" href="manifest.json">
+    <title>Base64 Encoder/Decoder</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --bg-color: #f5f7fa;
+            --text-color: #2d3436;
+            --card-bg: #ffffff;
+            --border-color: #dfe6e9;
+            --accent-color: #6c5ce7;
+            --accent-hover: #5b4cdb;
+            --secondary-bg: #f8f9fa;
+            --shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        [data-theme="dark"] {
+            --bg-color: #1a1a2e;
+            --text-color: #eaeaea;
+            --card-bg: #16213e;
+            --border-color: #0f3460;
+            --accent-color: #e94560;
+            --accent-hover: #d63050;
+            --secondary-bg: #1f2a4a;
+            --shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-color);
+            color: var(--text-color);
+            min-height: 100vh;
+            padding: 20px;
+            transition: background 0.3s, color 0.3s;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2rem;
+            animation: fadeInDown 0.6s ease-out;
+        }
+        
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            animation: fadeInUp 0.6s ease-out;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: 'Monaco', 'Menlo', monospace;
+            resize: vertical;
+            background: var(--secondary-bg);
+            color: var(--text-color);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+        
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        button.primary {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        button.primary:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
+        }
+        
+        button.primary:active {
+            transform: translateY(0);
+        }
+        
+        button.secondary {
+            background: var(--secondary-bg);
+            color: var(--text-color);
+            border: 2px solid var(--border-color);
+        }
+        
+        button.secondary:hover {
+            border-color: var(--accent-color);
+            background: var(--card-bg);
+        }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: var(--card-bg);
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            box-shadow: var(--shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.2);
+        }
+        
+        .shortcuts-help {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: var(--shadow);
+            font-size: 13px;
+            cursor: pointer;
+            border: none;
+            color: var(--text-color);
+            transition: transform 0.3s;
+        }
+        
+        .shortcuts-help:hover {
+            transform: translateY(-2px);
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 16px;
+            max-width: 450px;
+            width: 90%;
+            animation: scaleIn 0.3s ease-out;
+        }
+        
+        .modal-content h3 {
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .modal-content kbd {
+            background: var(--secondary-bg);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: monospace;
+            border: 1px solid var(--border-color);
+            font-size: 0.9em;
+        }
+        
+        .modal-content li {
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 10001;
+            animation: slideInRight 0.3s ease-out;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .toast.success {
+            background: #00b894;
+        }
+        
+        .toast.error {
+            background: #e74c3c;
+        }
+        
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 1.6rem;
+            }
+            
+            .card {
+                padding: 20px;
+            }
+            
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.3rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <button class="theme-toggle animate-fade-in-down" id="themeToggle" title="Toggle dark/light mode">🌙</button>
+    <button class="theme-toggle" id="themeToggle" title="Toggle theme">🌙</button>
+    
     <div class="container">
-        <h1 class="animate-fade-in-up stagger-1">🔐 Base64 Encoder/Decoder</h1>
-        <p class="subtitle animate-fade-in-up stagger-2">Encode/decode base64 with live preview & file support</p>
+        <h1>🔐 Base64 Encoder/Decoder</h1>
         
-        <div class="tool-box animate-fade-in-up stagger-3">
-            <div class="input-tabs">
-                <button type="button" class="tab-btn active" data-tab="text">📝 Text Input</button>
-                <button type="button" class="tab-btn" data-tab="file">📁 File Input</button>
+        <div class="card">
+            <div class="input-group">
+                <label for="input">Input Text</label>
+                <textarea id="input" placeholder="Enter text to encode or decode..." spellcheck="false"></textarea>
             </div>
             
-            <div id="text-tab" class="tab-content active">
-                <label>Input Text:</label>
-                <textarea id="input" placeholder="Enter text to encode or base64 to decode..."></textarea>
+            <div class="btn-group">
+                <button class="primary" id="encodeBtn">⬆️ Encode to Base64</button>
+                <button class="primary" id="decodeBtn">⬇️ Decode from Base64</button>
+                <button class="secondary" id="clearBtn">🗑️ Clear</button>
+                <button class="secondary" id="copyBtn">📋 Copy Result</button>
+                <button class="secondary" id="swapBtn">🔄 Swap</button>
             </div>
             
-            <div id="file-tab" class="tab-content">
-                <label>Upload File:</label>
-                <div class="file-drop-zone" id="fileDropZone">
-                    <span class="file-icon">📁</span>
-                    <p>Drop file here or click to browse</p>
-                    <input type="file" id="fileInput" hidden>
-                </div>
-                <div id="fileInfo" class="file-info hidden"></div>
-                <button type="button" id="clearFileBtn" class="secondary hidden">Clear File</button>
-            </div>
-            
-            <div class="toggle-group">
-                <label class="toggle">
-                    <input type="radio" name="mode" id="encodeMode" value="encode" checked>
-                    <span>🔒 Encode (Text → Base64)</span>
-                </label>
-                <label class="toggle">
-                    <input type="radio" name="mode" id="decodeMode" value="decode">
-                    <span>🔓 Decode (Base64 → Text)</span>
-                </label>
-            </div>
-            
-            <div class="options">
-                <label class="checkbox" title="Use URL-safe Base64 encoding (replaces +/ with -_)">
-                    <input type="checkbox" id="urlSafeMode">
-                    <span>🔗 URL-safe Base64 (replaces +/ with -_)</span>
-                </label>
-            </div>
-            
-            <div class="example-actions">
-                <button type="button" onclick="loadExample()" class="secondary">🎲 Load Example</button>
-                <span class="example-hint">Click to see it work!</span>
-            </div>
-            
-            <button onclick="process()">Process</button>
-            
-            <label>Result:</label>
-            <div id="result" class="result">
-                <em>Enter text or upload a file and click Process to see the result...</em>
-            </div>
-            
-            <div class="result-actions">
-                <button onclick="copy()" class="secondary">📋 Copy Result</button>
-                <button onclick="downloadResult()" class="secondary" id="downloadBtn" style="display:none;">💾 Download</button>
-                <button onclick="shareResult()" class="secondary" id="shareBtn" style="display:none;">🔗 Share</button>
-                <button onclick="clearAll()" class="secondary danger">🗑️ Clear</button>
-            </div>
-            
-            <!-- Export Format Options -->
-            <div class="export-formats" id="exportFormats" style="display:none;">
-                <label class="export-label">📤 Export Format:</label>
-                <div class="export-buttons">
-                    <button onclick="exportAs('txt')" class="export-btn" title="Plain text file">📄 TXT</button>
-                    <button onclick="exportAs('json')" class="export-btn" title="JSON format">📄 JSON</button>
-                    <button onclick="exportAs('base64')" class="export-btn" title="Base64 file">📄 B64</button>
-                    <button onclick="exportAs('html')" class="export-btn" title="HTML with formatting">📄 HTML</button>
-                    <button onclick="exportAs('markdown')" class="export-btn" title="Markdown format">📄 MD</button>
-                </div>
-            </div>
-            
-            <div id="stats" class="stats hidden"></div>
-        </div>
-        
-        <div class="example animate-fade-in-up stagger-4">
-            <h3>💡 Examples</h3>
-            <div class="example-grid">
-                <div class="example-card" onclick="loadExample('hello')">
-                    <strong>Hello World</strong>
-                    <code>Hello World!</code> → <code>SGVsbG8gV29ybGQh</code>
-                </div>
-                <div class="example-card" onclick="loadExample('urlsafe')">
-                    <strong>URL-safe Mode</strong>
-                    <code>Hello+World/</code> → URL-safe base64
-                </div>
-                <div class="example-card" onclick="loadExample('decode')">
-                    <strong>Decode Example</strong>
-                    <code>SGVsbG8gV29ybGQ=</code> → text
-                </div>
-            </div>
-            <p class="file-example"><strong>📁 File:</strong> Upload any file to get its base64 representation</p>
-        </div>
-        
-        <div class="bulk-section animate-fade-in-up stagger-5">
-            <h3>📤 Bulk Processor</h3>
-            <p class="bulk-description">Process multiple items at once! Enter one item per line (text or base64).</p>
-            <textarea id="bulkInput" placeholder="Enter multiple items, one per line...
-Example:
-Hello World
-https://example.com
-SGVsbG8gV29ybGQ="></textarea>
-            <div class="bulk-options">
-                <label class="checkbox">
-                    <input type="checkbox" id="bulkAutoDetect">
-                    <span>🔍 Auto-detect encode/decode (base64 strings will be decoded)</span>
-                </label>
-            </div>
-            <button onclick="processBulk()">⚡ Process All</button>
-            <div id="bulkResult" class="bulk-result hidden">
-                <div class="bulk-header">
-                    <strong>📋 Results:</strong>
-                    <span id="bulkStats"></span>
-                </div>
-                <div id="bulkOutput" class="bulk-output"></div>
-                <div class="bulk-actions">
-                    <button onclick="copyBulkResults()" class="secondary">📋 Copy All Results</button>
-                    <button onclick="downloadBulkResults()" class="secondary">💾 Download CSV</button>
-                    <button onclick="clearBulk()" class="secondary danger">🗑️ Clear</button>
-                </div>
+            <div class="input-group">
+                <label for="output">Output</label>
+                <textarea id="output" placeholder="Result will appear here..." readonly spellcheck="false"></textarea>
             </div>
         </div>
-
-        <div class="history-section animate-fade-in-up stagger-6">
-            <h3>📜 Recent Activity</h3>
-            <div id="historyList" class="history-list">
-                <p class="history-empty">No history yet. Start encoding/decoding to see your activity here!</p>
-            </div>
-            <button onclick="clearHistory()" class="clear-history-btn">Clear History</button>
-        </div>
-        
-        <details class="shortcuts-help">
-            <summary>⌨️ Keyboard Shortcuts</summary>
-            <ul class="shortcuts-list">
-                <li><kbd>Ctrl</kbd> + <kbd>Enter</kbd> - Process (encode/decode)</li>
-                <li><kbd>Ctrl</kbd> + <kbd>C</kbd> - Copy result</li>
-                <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - Download result</li>
-                <li><kbd>Ctrl</kbd> + <kbd>R</kbd> - Reset/clear all</li>
-                <li><kbd>Ctrl</kbd> + <kbd>E</kbd> - Switch to encode mode</li>
-                <li><kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> - Switch to decode mode</li>
-                <li><kbd>Ctrl</kbd> + <kbd>T</kbd> - Toggle dark/light theme</li>
-            </ul>
-        </details>
-        
-        <footer>
-            Made with 💡 by <a href="https://github.com/Agent-Lumi">Lumi</a>
-        </footer>
     </div>
     
-    <script src="app.js"></script>
+    <button class="shortcuts-help" id="shortcutsBtn">⌨️ Keyboard Shortcuts</button>
+    
+    <div class="modal" id="shortcutsModal">
+        <div class="modal-content">
+            <h3>⌨️ Keyboard Shortcuts</h3>
+            <ul style="list-style: none;">
+                <li><kbd>Ctrl + Enter</kbd> Encode</li>
+                <li><kbd>Ctrl + Shift + Enter</kbd> Decode</li>
+                <li><kbd>Ctrl + C</kbd> Copy output (when focused)</li>
+                <li><kbd>Ctrl + D</kbd> Toggle dark mode</li>
+                <li><kbd>Esc</kbd> Close modals</li>
+            </ul>
+            <button class="primary" id="closeModal" style="margin-top: 20px; width: 100%;">Close</button>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+
     <script>
-    // Enhanced animations on scroll
-    (function() {
-        const observerOptions = {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
-        };
+        // Theme toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const currentTheme = localStorage.getItem('theme') || 'light';
         
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('animate-fade-in-up');
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        themeToggle.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
         
-        // Observe all major sections
-        document.querySelectorAll('.bulk-section, .history-section, .shortcuts-help').forEach(section => {
-            observer.observe(section);
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            themeToggle.textContent = newTheme === 'dark' ? '☀️' : '🌙';
         });
-    })();
+        
+        // Base64 operations
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const encodeBtn = document.getElementById('encodeBtn');
+        const decodeBtn = document.getElementById('decodeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const swapBtn = document.getElementById('swapBtn');
+        const toast = document.getElementById('toast');
+        
+        function showToast(message, type = 'success') {
+            toast.textContent = message;
+            toast.className = 'toast show ' + type;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+        
+        encodeBtn.addEventListener('click', () => {
+            try {
+                output.value = btoa(unescape(encodeURIComponent(input.value)));
+                showToast('✅ Encoded successfully!');
+            } catch (e) {
+                showToast('❌ Encoding failed: ' + e.message, 'error');
+            }
+        });
+        
+        decodeBtn.addEventListener('click', () => {
+            try {
+                output.value = decodeURIComponent(escape(atob(input.value)));
+                showToast('✅ Decoded successfully!');
+            } catch (e) {
+                showToast('❌ Invalid Base64 string!', 'error');
+            }
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            input.value = '';
+            output.value = '';
+            input.focus();
+        });
+        
+        copyBtn.addEventListener('click', async () => {
+            if (output.value) {
+                await navigator.clipboard.writeText(output.value);
+                showToast('📋 Copied to clipboard!');
+            } else {
+                showToast('⚠️ Nothing to copy!', 'error');
+            }
+        });
+        
+        swapBtn.addEventListener('click', () => {
+            const temp = input.value;
+            input.value = output.value;
+            output.value = temp;
+        });
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Ctrl/Cmd + Enter = Encode
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                encodeBtn.click();
+            }
+            // Ctrl/Cmd + Shift + Enter = Decode
+            else if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'Enter') {
+                e.preventDefault();
+                decodeBtn.click();
+            }
+            // Ctrl/Cmd + D = Toggle theme
+            else if ((e.ctrlKey || e.metaKey) && e.key === 'd') {
+                e.preventDefault();
+                themeToggle.click();
+            }
+            // Escape = Close modals
+            else if (e.key === 'Escape') {
+                shortcutsModal.classList.remove('show');
+            }
+        });
+        
+        // Shortcuts modal
+        const shortcutsBtn = document.getElementById('shortcutsBtn');
+        const shortcutsModal = document.getElementById('shortcutsModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        shortcutsBtn.addEventListener('click', () => {
+            shortcutsModal.classList.add('show');
+        });
+        
+        closeModal.addEventListener('click', () => {
+            shortcutsModal.classList.remove('show');
+        });
+        
+        shortcutsModal.addEventListener('click', (e) => {
+            if (e.target === shortcutsModal) {
+                shortcutsModal.classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
-<script>
-// Import from file
-const importBtn = document.createElement('button');
-importBtn.textContent = '📁 Import';
-importBtn.onclick = () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const textArea = document.querySelector('textarea');
-            if (textArea) textArea.value = e.target.result;
-        };
-        reader.readAsText(file);
-    };
-    input.click();
-};
-document.querySelector('.container')?.appendChild(importBtn);
-</script>
-<script>
-// API integration ready
-const API = {
-    async fetch(url, options = {}) {
-        const response = await fetch(url, options);
-        return response.json();
-    }
-};
-</script>
